@@ -4,6 +4,7 @@ Diseño e implementación de un robot omnidireccional para finas de entretenimie
 # BOM (Build Of Materials)
 
 * [Pololu Dual MC33926 Motor Driver Carrier](https://www.pololu.com/product/1213)
+* [Omni Wheel 40x28mm Plástico](https://hobbyking.com/es_es/40x28mm-plastic-omni-wheel-2pcs-bag.html)
 
 
 # License 
