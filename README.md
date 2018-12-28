@@ -1,9 +1,10 @@
 # OmniRobot
-Diseño e implementación de un robot omnidireccional para finas de entretenimiento. Proyecto de Final de Grado de Ingeniería Electrónica Industrial y Automática por la Universidad Darlos III de Madrid. 
+Diseño e implementación de un robot omnidireccional para fines de entretenimiento. Proyecto de Final de Grado de Ingeniería Electrónica Industrial y Automática por la Universidad Carlos III de Madrid. 
 
 # BOM (Build Of Materials)
 
 * [Pololu Dual MC33926 Motor Driver Carrier](https://www.pololu.com/product/1213)
+* [Omni Wheel 40x28mm Plástico](https://hobbyking.com/es_es/40x28mm-plastic-omni-wheel-2pcs-bag.html)
 
 
 # License 
