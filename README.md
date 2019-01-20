@@ -1,14 +1,20 @@
+<img src="images/logo_Uc3m.png" width="200" align = "center">
 # OmniRobot
 Diseño e implementación de un robot omnidireccional para fines de entretenimiento. Proyecto de Final de Grado de Ingeniería Electrónica Industrial y Automática por la Universidad Carlos III de Madrid. 
 
-# BOM (Build Of Materials)
+## BOM (Build Of Materials)
 
 * [Pololu Dual MC33926 Motor Driver Carrier](https://www.pololu.com/product/1213)
 * [Omni Wheel 40x28mm Plástico](https://hobbyking.com/es_es/40x28mm-plastic-omni-wheel-2pcs-bag.html)
 * Partes Impresas en **PETG** de [Fiberlogy](https://fiberlogy.com/en/fiberlogy-filaments/filament-pet-g/)
 
+## Contributors
 
-# License 
+- [Asociación de Robótica de la Universidad Carlos III de Madrid](https://asrob.uc3m.es/)
+
+<img src="images/asrob.png" width="200" align = "center">
+
+## License 
 
 <img src="images/by-sa.png" width="200" align = "center">
 
@@ -19,3 +25,5 @@ Este robot tiene una licencia [Creative Commons Attribution-ShareAlike 4.0 Inter
 Original concept by [k120189](http://www.thingiverse.com/k120189/about) on [Thingiverse](http://www.thingiverse.com/thing:43708)
 
 More information: [CC-BY-SA](https://github.com/GioSunrider/OmniRobot/blob/master/LICENSE)
+
+
