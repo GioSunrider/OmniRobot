@@ -9,10 +9,10 @@ Diseño e implementación de un robot omnidireccional para fines de entretenimie
 * [Omni Wheel 40x28mm Plástico](https://hobbyking.com/es_es/40x28mm-plastic-omni-wheel-2pcs-bag.html)
 * Partes Impresas en **PETG** de [Fiberlogy](https://fiberlogy.com/en/fiberlogy-filaments/filament-pet-g/)
 
-## Contributors
 <img src="images/asrob.png" width="150" align = "right">
+## Contributors
 
-- [Asociación de Robótica de la Universidad Carlos III de Madrid](https://asrob.uc3m.es/)
+ - [Asociación de Robótica de la Universidad Carlos III de Madrid](https://asrob.uc3m.es/)
 
 ## License 
 
@@ -25,5 +25,4 @@ Este robot tiene una licencia [Creative Commons Attribution-ShareAlike 4.0 Inter
 Original concept by [k120189](http://www.thingiverse.com/k120189/about) on [Thingiverse](http://www.thingiverse.com/thing:43708)
 
 More information: [CC-BY-SA](https://github.com/GioSunrider/OmniRobot/blob/master/LICENSE)
-
 
