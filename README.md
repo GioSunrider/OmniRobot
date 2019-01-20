@@ -1,4 +1,5 @@
-<img src="images/logo_Uc3m.png" width="200" align = "center">
+<img src="images/logo_Uc3m.png" width="700" align = "center">
+
 # OmniRobot
 Diseño e implementación de un robot omnidireccional para fines de entretenimiento. Proyecto de Final de Grado de Ingeniería Electrónica Industrial y Automática por la Universidad Carlos III de Madrid. 
 
@@ -9,10 +10,9 @@ Diseño e implementación de un robot omnidireccional para fines de entretenimie
 * Partes Impresas en **PETG** de [Fiberlogy](https://fiberlogy.com/en/fiberlogy-filaments/filament-pet-g/)
 
 ## Contributors
+<img src="images/asrob.png" width="150" align = "right">
 
 - [Asociación de Robótica de la Universidad Carlos III de Madrid](https://asrob.uc3m.es/)
-
-<img src="images/asrob.png" width="200" align = "center">
 
 ## License 
 
