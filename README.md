@@ -10,6 +10,7 @@ Diseño e implementación de un robot omnidireccional para fines de entretenimie
 * Partes Impresas en **PETG** de [Fiberlogy](https://fiberlogy.com/en/fiberlogy-filaments/filament-pet-g/)
 
 <img src="images/asrob.png" width="150" align = "right">
+
 ## Contributors
 
  - [Asociación de Robótica de la Universidad Carlos III de Madrid](https://asrob.uc3m.es/)
