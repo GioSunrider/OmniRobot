@@ -15,6 +15,7 @@ Diseño e implementación de un robot omnidireccional para fines de entretenimie
 
 ## Contributors
 
+ - Tutoring by [@David-Estevez](https://github.com/David-Estevez)
  - [Asociación de Robótica de la Universidad Carlos III de Madrid](https://asrob.uc3m.es/)
 
 ## License 
