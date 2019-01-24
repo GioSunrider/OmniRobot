@@ -3,7 +3,7 @@
 # OmniRobot
 Diseño e implementación de un robot omnidireccional para fines de entretenimiento. Proyecto de Final de Grado de Ingeniería Electrónica Industrial y Automática por la Universidad Carlos III de Madrid. 
 
-<img src="images/OmniRobot.jpg" width="700" align = "center">
+<img src="images/OmniRobot.png" width="700" align = "center">
 
 ## BOM (Build Of Materials)
 
