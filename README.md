@@ -7,6 +7,7 @@ Diseño e implementación de un robot omnidireccional para fines de entretenimie
 
 ## BOM (Build Of Materials)
 
+* [100:1 Metal Gearmotor 37Dx57L mm](https://www.pololu.com/product/1106/specs)
 * [Pololu Dual MC33926 Motor Driver Carrier](https://www.pololu.com/product/1213)
 * [Omni Wheel 40x28mm Plástico](https://hobbyking.com/es_es/40x28mm-plastic-omni-wheel-2pcs-bag.html)
 * Partes Impresas en **PETG** de [Fiberlogy](https://fiberlogy.com/en/fiberlogy-filaments/filament-pet-g/)
