@@ -1,129 +1,183 @@
+/*
+ * Designed by @GioSunrider
+ * TFG OmniRobot V0.1
+ * CC-BY-SA
+ * 
+ */
+ 
+// ------------------------------------------------------------------------------------------
+// Librerias
+// ------------------------------------------------------------------------------------------
 
-#include <Servo.h>
+#include <FlySkyIBus.h>
 
-/* Arduino pin list */
+// ------------------------------------------------------------------------------------------
+// Distancia entre es extremo de los ejes y el centro
+// ------------------------------------------------------------------------------------------
 
-int speed1Pin = 3;
-int direction1Pin = 2;
-int speed0Pin = 5;
-int direction0Pin = 4;
-int speed2Pin = 6;
-int direction2Pin = 7;
-int laserPinRigth = 8;
-int laserPinLeft = 9;
-int servoPinRigth = 10;
-int servoPinLeft = 11;
-int ldrPin = A0;
+float arms_size = 140;
 
-/* Distance between the center and the wheel's axis  */
+// ------------------------------------------------------------------------------------------
+// DEFINICION PINES Pololu Dual MC33926 Motor Driver Shield
+//              ARDUINO MICRO PRO
+// ------------------------------------------------------------------------------------------
 
-float arms_size = 110.74;
+#define ENABLE  2
 
-/* LDR threshold */
+#define MotorA1 4
+#define MotorA2 5
 
-int laser_impact = 210;
+#define MotorB1 7
+#define MotorB2 8
 
-/* Other variables */
+#define MotorC1 10
+#define MotorC2 16
+
+#define PWMA    3
+#define PWMB    6
+#define PWMC    9
+
+// ------------------------------------------------------------------------------------------
+// DEFINICION PINES Entrada iBus 
+//       Emisora Flysky FS-i6
+//      Receptor Flysky FS-X6B
+// ------------------------------------------------------------------------------------------
+
+int Channel_1;  //Ahead and back pin
+int Channel_2;  //Left and Right pin
+int Channel_3;  //Rotation pin
+//int Channel_4;  //Shooter Up-Down
+int Channel_5;  //ENABLE
+
+// ------------------------------------------------------------------------------------------
+// DEFINICION de VARIABLES AUXILIARES
+// ------------------------------------------------------------------------------------------
+
+float radio_ruedas = 50;
+float distacia_eje = 200;
 
 float speed_0 = 0;
 float speed_1 = 0;
 float speed_2 = 0;
-float speed_X = 0;
-float speed_Y = 0;
-float speed_W = 0;
-int shot = 0;
 
-bool shooting_up = false;
-unsigned long previousMillis = 0;
-unsigned long previousShotMillis = 0;
-unsigned long previousTimeoutMillis = 0;
-const long interval = 5000;
-const long shot_interval = 150;
-const long timeout_interval = 1000;
-boolean stringComplete = false;
-boolean startMessage = false;
-boolean weaponRigth = true;
+float theta = 0;
 
-Servo servoRigth;
-Servo servoLeft;
 
-void setup() {
-  Serial.begin(19200);
-  pinMode(laserPinRigth, OUTPUT);
-  pinMode(laserPinLeft, OUTPUT);
-  servoRigth.attach(servoPinRigth);
-  servoLeft.attach(servoPinLeft);
+void setup(){
+
+  Serial.begin(115200);
+  IBus.begin(Serial1);
+
+  pinMode(ENABLE,OUTPUT);
+  digitalWrite (ENABLE, HIGH);
+
+  pinMode(PWMA,OUTPUT);
+  pinMode(PWMB,OUTPUT);
+  pinMode(PWMC,OUTPUT);
+
+  pinMode(MotorA1,OUTPUT);
+  pinMode(MotorA2,OUTPUT);
+
+  pinMode(MotorB1,OUTPUT);
+  pinMode(MotorB2,OUTPUT);
+
+  pinMode(MotorC1,OUTPUT);
+  pinMode(MotorC2,OUTPUT);
+
+  Serial.begin(9600);
 }
 
-/*
-Read a string from the serial port bluetooth with the following structure:
-(speed_X;speed_Y;speed_W;shot)
-speed_X = -1.00 to 1.00 Float with two decimal
-speed_Y = -1.00 to 1.00 Float with two decimal
-speed_W = -1.00 to 1.00 Float with two decimal
-shot = 0 or 1 Int
-This fuction save in inputString a string with the following structure:
-speed_X;speed_Y;speed_W;shot;
-stringComplete = true when a complete message is received.
-*/
+void loop() {
+  //Lectura
+  
+  IBus.loop();
+  
+  Channel_1 = IBus.readChannel(0) - 1000; //Valores entre 0 y 1000
+  Channel_2 = IBus.readChannel(1) - 1000; //Valores entre 0 y 1000
+  Channel_3 = IBus.readChannel(2) - 1000; //Valores entre 0 y 1000
+  //Channel_4 = IBus.readChannel(3) - 1000; //Valores entre 0 y 1000
+  Channel_5 = IBus.readChannel(4) - 1000; //Valores entre 0 y 1000
 
-String read_string() {
-  String inputString = "";
-  char inChar;
-  while (Serial.available()) {
-    inChar = (char)Serial.read();
-    if (inChar == ')') {
-      startMessage = false;
-      stringComplete = true;
-      inputString += ';';
+  Serial.println(Channel_5);
+
+  if (Channel_5 > 500){ //"ARMADO" de los motores
+  
+    if(Channel_1>500){
+      //Channel_1 = map(Channel_1, 500, 1000, 0, 500);
+      Channel_1 = map(Channel_1, 500, 1000, 0, 1.00);
+      digitalWrite(MotorA1, HIGH);
+      digitalWrite(MotorA2, LOW);
+    } else {
+      //Channel_1 = map(Channel_1, 500, 0, 0, 500);
+      Channel_1 = map(Channel_1, 500, 0, 0, -1.00);
+      digitalWrite(MotorA1, LOW);
+      digitalWrite(MotorA2, HIGH);
     }
-    if (startMessage) inputString += inChar;
-    if (inChar == '(' && !startMessage) startMessage = true;
-    if (inChar == '(' && startMessage) inputString = "";
-    delay(1);
-    if (stringComplete) break;
-  }
-  return inputString;
-}
 
-/*
-Parse the inputString string and update speed_X, speed_Y, speed_W and shot.
-At the end, calls combine_movements() to convert the movement in (X, Y, W) to wheels speed.
-*/
-
-void parse_string(String inputString) {
-  int message_substring = 0;
-  String substr = "";
-  for (int i = 0 ; i < inputString.length(); i++) {
-    if (inputString[i] == ';') {
-      message_substring++;
-      switch (message_substring) {
-        case 1:
-          speed_X = substr.toFloat();
-          substr = "";
-        case 2:
-          speed_Y = substr.toFloat();
-          substr = "";
-        case 3:
-          speed_W = substr.toFloat();
-          substr = "";
-        case 4:
-          shot = substr.toInt();
-          substr = "";
-      }
+    if(Channel_2>500){
+      //Channel_2 = map(Channel_2, 500, 1000, 0, 500);
+      Channel_2 = map(Channel_2, 500, 1000, 0, 1.00);
+      digitalWrite(MotorB1, HIGH);
+      digitalWrite(MotorB2, LOW);
+    } else {
+      //Channel_2 = map(Channel_2, 500, 0, 0, 500);
+      Channel_2 = map(Channel_2, 500, 0, 0, -1.00);
+      digitalWrite(MotorB1, LOW);
+      digitalWrite(MotorB2, HIGH);
     }
-    else substr += (char)inputString[i];
+
+    if(Channel_3>500){
+      //Channel_3 = map(Channel_3, 500, 1000, 0, 360);
+      Channel_3 = map(Channel_3, 500, 1000, 0, 1.00);
+      digitalWrite(MotorC1, HIGH);
+      digitalWrite(MotorC2, LOW);
+    } else {
+      //Channel_3 = map(Channel_3, 500, 0, 0, 360);
+      Channel_3 = map(Channel_3, 500, 0, 0, -1.00);
+      digitalWrite(MotorC1, LOW);
+      digitalWrite(MotorC2, HIGH);
+    }
+
+  Serial.println(Channel_1);
+  Serial.println(Channel_2);
+  Serial.println(Channel_3);
+
+  //Escritura
+  //vector_movement(Channel_1, Channel_2, Channel_3);
+  combine_movements(Channel_1, Channel_2, Channel_3);
   }
-  combine_movements();
 }
+  
+
+// ------------------------------------------------------------------------------------------
+// Convert the movement in (X, Y, W) to wheels speed.
+// ------------------------------------------------------------------------------------------
 
 /*
-Convert the movement in (X, Y, W) to wheels speed.
-http://www.inescporto.pt/~hfpo/papers/Oliveira_CRCS_INTECH.pdf-> equation(2)
-At the end, calls set_speed() to set the new wheels speed normalized (-1 to 1). 
+void vector_movement(float X, float Y, float W){
+  speed_0 = ((-sin(theta)*X) + (cos(theta)*Y) + (distacia_eje*W))/ radio_ruedas;                //Frontal
+  speed_1 = ((-sin((PI/3)-theta)*X) + (-cos((PI/3)-theta)*Y) + (distacia_eje*W))/ radio_ruedas; //Izquierda
+  speed_2 = ((sin((PI/3)+theta)*X) + (-cos((PI/3)+theta)*Y) + (distacia_eje*W))/ radio_ruedas;  //Derecha
+
+  set_speed(0, speed_0);
+  set_speed(1, speed_1);
+  set_speed(2, speed_2);
+  }
+
+void set_speed(int motor, float spd) {
+  spd = map(spd, 0, 1500, 0, 255);
+  switch (motor) {
+    case 0:
+      analogWrite(PWMA, spd);
+    case 1:
+      analogWrite(PWMB, spd);
+    case 2:
+      analogWrite(PWMC, spd);
+  }
+}
 */
 
-void combine_movements() {
+void combine_movements(float speed_X, float speed_Y, float speed_W) {
   speed_0 = (-speed_X * sin(PI / 3)) + (speed_Y * cos(PI / 3)) + speed_W;
   speed_1 = -speed_Y + speed_W;
   speed_2 = (speed_X * sin(PI / 3)) + (speed_Y * cos(PI / 3)) + speed_W;
@@ -144,37 +198,16 @@ void combine_movements() {
   set_speed(2, speed_2, norm);
 }
 
-/*
-Set wheel speeds using a https://www.pololu.com/product/2990
-*/
-
 void set_speed(int motor, float spd, float norm) {
   int dir = 1;
   if (spd < 0) dir = 0;
   spd = map(abs(spd / norm) * 100, 0.0, 100.0, 0, 255);
-  switch (motor) {
+    switch (motor) {
     case 0:
-      digitalWrite(direction0Pin, dir);
-      analogWrite(speed0Pin, spd);
+      analogWrite(PWMA, spd);
     case 1:
-      digitalWrite(direction1Pin, dir);
-      analogWrite(speed1Pin, spd);
+      analogWrite(PWMB, spd);
     case 2:
-      digitalWrite(direction2Pin, dir);
-      analogWrite(speed2Pin, spd);
-  }
-}
-
-
-void loop() {
-  //Read and parse the input string
-  String incoming;
-  if (Serial.available()) incoming = read_string();
-  if (stringComplete) {
-    parse_string(incoming);
-    stringComplete = false;
-  }
-  servoRigth.write(85);
-  servoLeft.write(85);
-  //}
+      analogWrite(PWMC, spd);
+    }
 }
