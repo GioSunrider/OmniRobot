@@ -43,11 +43,11 @@ float arms_size = 140;
 //      Receptor Flysky FS-X6B
 // ------------------------------------------------------------------------------------------
 
-int Channel_1;  //Ahead and back pin
-int Channel_2;  //Left and Right pin
-int Channel_3;  //Rotation pin
-//int Channel_4;  //Shooter Up-Down
-int Channel_5;  //ENABLE
+float Channel_1;  //Ahead and back pin
+float Channel_2;  //Left and Right pin
+float Channel_3;  //Shooter Up-Down
+float Channel_4;  //Rotation pin
+float Channel_5;  //ENABLE
 
 // ------------------------------------------------------------------------------------------
 // DEFINICION de VARIABLES AUXILIARES
@@ -62,14 +62,12 @@ float speed_2 = 0;
 
 float theta = 0;
 
-
 void setup(){
 
   Serial.begin(115200);
   IBus.begin(Serial1);
 
   pinMode(ENABLE,OUTPUT);
-  digitalWrite (ENABLE, HIGH);
 
   pinMode(PWMA,OUTPUT);
   pinMode(PWMB,OUTPUT);
@@ -91,60 +89,72 @@ void loop() {
   //Lectura
   
   IBus.loop();
-  
-  Channel_1 = IBus.readChannel(0) - 1000; //Valores entre 0 y 1000
-  Channel_2 = IBus.readChannel(1) - 1000; //Valores entre 0 y 1000
+
   Channel_3 = IBus.readChannel(2) - 1000; //Valores entre 0 y 1000
-  //Channel_4 = IBus.readChannel(3) - 1000; //Valores entre 0 y 1000
   Channel_5 = IBus.readChannel(4) - 1000; //Valores entre 0 y 1000
 
+  Serial.print("5: ");
   Serial.println(Channel_5);
 
   if (Channel_5 > 500){ //"ARMADO" de los motores
-  
+
+    digitalWrite (ENABLE, HIGH);
+
+    Channel_1 = IBus.readChannel(0) - 1000; //Valores entre 0 y 1000
+      
     if(Channel_1>500){
       //Channel_1 = map(Channel_1, 500, 1000, 0, 500);
-      Channel_1 = map(Channel_1, 500, 1000, 0, 1.00);
+      Channel_1 = map(Channel_1, 500, 1000, 0.00, 1.00);
       digitalWrite(MotorA1, HIGH);
       digitalWrite(MotorA2, LOW);
     } else {
       //Channel_1 = map(Channel_1, 500, 0, 0, 500);
-      Channel_1 = map(Channel_1, 500, 0, 0, -1.00);
+      Channel_1 = map(Channel_1, 500, 0, 0.00, -1.00);
       digitalWrite(MotorA1, LOW);
       digitalWrite(MotorA2, HIGH);
     }
 
+    Channel_2 = IBus.readChannel(1) - 1000; //Valores entre 0 y 1000
+
     if(Channel_2>500){
       //Channel_2 = map(Channel_2, 500, 1000, 0, 500);
-      Channel_2 = map(Channel_2, 500, 1000, 0, 1.00);
+      Channel_2 = map(Channel_2, 500, 1000, 0.00, 1.00);
       digitalWrite(MotorB1, HIGH);
       digitalWrite(MotorB2, LOW);
     } else {
       //Channel_2 = map(Channel_2, 500, 0, 0, 500);
-      Channel_2 = map(Channel_2, 500, 0, 0, -1.00);
+      Channel_2 = map(Channel_2, 500, 0, 0.00, -1.00);
       digitalWrite(MotorB1, LOW);
       digitalWrite(MotorB2, HIGH);
     }
+    
+    Channel_4 = IBus.readChannel(3) - 1000; //Valores entre 0 y 1000   
 
-    if(Channel_3>500){
-      //Channel_3 = map(Channel_3, 500, 1000, 0, 360);
-      Channel_3 = map(Channel_3, 500, 1000, 0, 1.00);
+    if(Channel_4>500){
+      //Channel_4 = map(Channel_4, 500, 1000, 0, 360);
+      Channel_4 = map(Channel_4, 500, 1000, 0.00, 1.00);
       digitalWrite(MotorC1, HIGH);
       digitalWrite(MotorC2, LOW);
     } else {
-      //Channel_3 = map(Channel_3, 500, 0, 0, 360);
-      Channel_3 = map(Channel_3, 500, 0, 0, -1.00);
+      //Channel_4 = map(Channel_4, 500, 0, 0, 360);
+      Channel_4 = map(Channel_4, 500, 0, 0.00, -1.00);
       digitalWrite(MotorC1, LOW);
       digitalWrite(MotorC2, HIGH);
     }
 
-  Serial.println(Channel_1);
-  Serial.println(Channel_2);
-  Serial.println(Channel_3);
+  Serial.print("1: ");
+  Serial.print(Channel_1);
+  Serial.print("  2: ");
+  Serial.print(Channel_2);
+  Serial.print("  3: ");
+  Serial.print(Channel_3);
+  Serial.print("  4: ");
+  Serial.println(Channel_4);
+
 
   //Escritura
-  //vector_movement(Channel_1, Channel_2, Channel_3);
-  combine_movements(Channel_1, Channel_2, Channel_3);
+  //vector_movement(Channel_1, Channel_2, Channel_4);
+  combine_movements(Channel_1, Channel_2, Channel_4);
   }
 }
   
