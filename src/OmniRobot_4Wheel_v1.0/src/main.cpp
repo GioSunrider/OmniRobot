@@ -38,6 +38,14 @@ float Channel_3;  //Shooter Up-Down
 float Channel_4;  //Rotation pin
 float Channel_5;  //ENABLE
 
+// ------------------------------------------------------------------------------------------
+// Declaracion de los motores
+// ------------------------------------------------------------------------------------------
+
+AF_DCMotor LeftFrontWheel(1, MOTOR12_64KHZ);
+AF_DCMotor RightFrontWheel(2, MOTOR12_64KHZ);
+AF_DCMotor LeftBackWheel(3, MOTOR34_64KHZ);
+AF_DCMotor RightBackWheel(4, MOTOR34_64KHZ);
 
 // ------------------------------------------------------------------------------------------
 // Habilitacion de los Pines
@@ -54,52 +62,108 @@ void setup(){
 // Convert the movement in (X, Y, W) to wheels speed.
 // ------------------------------------------------------------------------------------------
 
-void set_speed(int motor, float spd) {
-  if (spd > 0){
-
-    spd = map(spd, 0, 30, 0, 255);
-    switch (motor) {
-      case 0:
-
-      case 1:
-
-      case 2:
-
-     }
-  }
-
-  if (spd < 0){
-
-  spd = map(spd, 0, 30, 0, 255);
-    switch (motor) {
-      case 0:
-
-      case 1:
-
-      case 2:
-
-    }
-  }
+vector_movement(Channel_1, Channel_2, Channel_4){
+  if (Channel_2 > 150) {
+   moveSidewaysLeft();
+ }
+ else if (Channel_2 < 100) {
+   moveSidewaysRight();
+ }
+ else if (Channel_1 > 160) {
+   moveForward();
+ }
+ else if (Channel_1 < 100) {
+   moveBackward();
+ }
+ else if (Channel_4 < 100 & data.j2PotY > 160) {
+   moveRightForward();
+ }
+ else if (Channel_4 > 160 & data.j2PotY > 160) {
+   moveLeftForward();
+ }
+ else if (Channel_4 < 100 & data.j2PotY < 100) {
+   moveRightBackward();
+ }
+ else if (Channel_4 > 160 & data.j2PotY < 100) {
+   moveLeftBackward();
+ }
+ else if (Channel_4 < 100) {
+   rotateRight();
+ }
+ else if (Channel_4 > 150) {
+   rotateLeft();
+ }
+ else {
+   stopMoving();
+ }
 }
 
-void vector_movement(float X, float Y, float W)
-{
-
-  speed_0 =                          //Frontal
-  speed_1 =     //Izquierda
-  speed_2 =  //Derecha
-
-  Serial.print("speed_0: ");
-  Serial.print(speed_0);
-  Serial.print(" speed_1: ");
-  Serial.print(speed_0);
-  Serial.print(" speed_2: ");
-  Serial.println(speed_0);
-
-  set_speed(0, speed_0);
-  set_speed(1, speed_1);
-  set_speed(2, speed_2);
-}
+  void moveForward() {
+    LeftFrontWheel.run(FORWARD);
+    LeftBackWheel.run(FORWARD);
+    RightFrontWheel.run(FORWARD);
+    RightBackWheel.run(FORWARD);
+  }
+  void moveBackward() {
+    LeftFrontWheel.run(BACKWARD);
+    LeftBackWheel.run(BACKWARD);
+    RightFrontWheel.run(BACKWARD);
+    RightBackWheel.run(BACKWARD);
+  }
+  void moveSidewaysRight() {
+    LeftFrontWheel.run(FORWARD);
+    LeftBackWheel.run(BACKWARD);
+    RightFrontWheel.run(BACKWARD);
+    RightBackWheel.run(FORWARD);
+  }
+  void moveSidewaysLeft() {
+    LeftFrontWheel.run(BACKWARD);
+    LeftBackWheel.run(FORWARD);
+    RightFrontWheel.run(FORWARD);
+    RightBackWheel.run(BACKWARD);
+  }
+  void rotateLeft() {
+    LeftFrontWheel.run(BACKWARD);
+    LeftBackWheel.run(BACKWARD);
+    RightFrontWheel.run(FORWARD);
+    RightBackWheel.run(FORWARD);
+  }
+  void rotateRight() {
+    LeftFrontWheel.run(FORWARD);
+    LeftBackWheel.run(FORWARD);
+    RightFrontWheel.run(BACKWARD);
+    RightBackWheel.run(BACKWARD);
+  }
+  void moveRightForward() {
+    LeftFrontWheel.run(FORWARD);
+    LeftBackWheel.run(RELEASE);
+    RightFrontWheel.run(RELEASE);
+    RightBackWheel.run(FORWARD);
+  }
+  void moveRightBackward() {
+    LeftFrontWheel.run(RELEASE);
+    LeftBackWheel.run(BACKWARD);
+    RightFrontWheel.run(BACKWARD);
+    RightBackWheel.run(RELEASE);
+  }
+  void moveLeftForward() {
+    LeftFrontWheel.run(RELEASE);
+    LeftBackWheel.run(FORWARD);
+    RightFrontWheel.run(FORWARD);
+    RightBackWheel.run(RELEASE);
+  }
+  void moveLeftBackward() {
+    LeftFrontWheel.run(BACKWARD);
+    LeftBackWheel.run(RELEASE);
+    RightFrontWheel.run(RELEASE);
+    RightBackWheel.run(BACKWARD);
+  }
+  void stopMoving() {
+    LeftFrontWheel.run(RELEASE);
+    LeftBackWheel.run(RELEASE);
+    RightFrontWheel.run(RELEASE);
+    RightBackWheel.run(RELEASE);
+  }
 
 
 // ------------------------------------------------------------------------------------------
