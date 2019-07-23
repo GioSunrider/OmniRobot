@@ -10,7 +10,6 @@
 // ------------------------------------------------------------------------------------------
 
 #include <Arduino.h>
-#include <math.h>
 #include <FlySkyIBus.h>
 #include <AFMotor.h>
 
@@ -21,10 +20,10 @@
 
 const float arms_size = 65; //mm
 
+float speed_0 = 0;
 float speed_1 = 0;
 float speed_2 = 0;
 float speed_3 = 0;
-float speed_4 = 0;
 
 // ------------------------------------------------------------------------------------------
 //       Emisora Flysky FS-i6
@@ -57,7 +56,7 @@ void setup(){
   LeftFrontWheel.run(RELEASE);
   RightFrontWheel.run(RELEASE);
   RightBackWheel.run(RELEASE);
-  LeftBackWheel.run(RELEASE)
+  LeftBackWheel.run(RELEASE);
 
   Serial.begin(9600);
 }
@@ -65,46 +64,46 @@ void setup(){
 // Convert the movement in (X, Y, W) to wheels speed.
 // ------------------------------------------------------------------------------------------
 
-void set_speed(int motor, float spd, float norm) {
+void set_speed(int motor, float spd) {
   if (spd > 0){
     spd = map(spd, 0, 30, 0, 255);
     switch (motor) {
       case 0:
-        LeftFrontWheel.speed(spd);
+        LeftFrontWheel.setSpeed(spd);
         LeftFrontWheel.run(FORWARD);
         break;
       case 1:
-        RightFrontWheel.speed(spd);
+        RightFrontWheel.setSpeed(spd);
         RightFrontWheel.run(FORWARD);
         break;
       case 2:
-        RightBackWheel.speed(spd);
+        RightBackWheel.setSpeed(spd);
         RightBackWheel.run(FORWARD);
         break;
       case 3:
-        LeftBackWheel.speed(spd);
+        LeftBackWheel.setSpeed(spd);
         LeftBackWheel.run(FORWARD);
         break;
      }
   }
 
   if (spd < 0){
-  spd = map(abs(spd / norm) * 100, 0.0, 100.0, 0, 255);
+    spd = map(spd, 0, 30, 0, 255);
     switch (motor) {
       case 0:
-        LeftFrontWheel.speed(spd);
+        LeftFrontWheel.setSpeed(spd);
         LeftFrontWheel.run(BACKWARD);
         break;
       case 1:
-        RightFrontWheel.speed(spd);
+        RightFrontWheel.setSpeed(spd);
         RightFrontWheel.run(BACKWARD);
         break;
       case 2:
-        RightBackWheel.speed(spd);
+        RightBackWheel.setSpeed(spd);
         RightBackWheel.run(BACKWARD);
         break;
       case 3:
-        LeftBackWheel.speed(spd);
+        LeftBackWheel.setSpeed(spd);
         LeftBackWheel.run(BACKWARD);
         break;
 
@@ -116,12 +115,12 @@ void vector_movement(float X, float Y, float W) {
   speed_0 = ((Y)+(arms_size*W));
   speed_1 = ((-X)+(arms_size*W));
   speed_2 = ((-Y)+(arms_size*W));
-  speed_3 = ((X)+(arms_size*W)
+  speed_3 = ((X)+(arms_size*W));
 
-  set_speed(0, speed_0, norm);
-  set_speed(1, speed_1, norm);
-  set_speed(2, speed_2, norm);
-  set_speed(3, speed_2, norm);
+  set_speed(0, speed_0);
+  set_speed(1, speed_1);
+  set_speed(2, speed_2);
+  set_speed(3, speed_2);
 }
 /*
   void moveForward() {
@@ -217,8 +216,6 @@ Serial.println(Channel_5);
 
   if (Channel_5 > 500) //"ARMADO" de los motores
   {
-
-    digitalWrite (ENABLE, HIGH);
 
     if(Channel_1>500){
 
