@@ -74,10 +74,13 @@ void set_speed(int motor, float spd, float norm) {
     switch (motor) {
       case 0:
         analogWrite(PWMA, spd);
+        break;
       case 1:
         analogWrite(PWMB, spd);
+        break;
       case 2:
         analogWrite(PWMC, spd);
+        break;
      }
   }
 
@@ -95,10 +98,13 @@ void set_speed(int motor, float spd, float norm) {
     switch (motor) {
       case 0:
         analogWrite(PWMA, spd);
+        break;
       case 1:
         analogWrite(PWMB, spd);
+        break;
       case 2:
         analogWrite(PWMC, spd);
+        break;
     }
   }
 }

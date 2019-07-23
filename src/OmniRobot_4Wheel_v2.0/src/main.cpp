@@ -19,8 +19,7 @@
 // Declaracion de Variable Auxiliares
 // ------------------------------------------------------------------------------------------
 
-const float arms_size = 110; //mm
-
+const float arms_size = 70; //mm
 
 float speed_1 = 0;
 float speed_2 = 0;
@@ -62,14 +61,63 @@ void setup(){
 // Convert the movement in (X, Y, W) to wheels speed.
 // ------------------------------------------------------------------------------------------
 
-vector_movement(Channel_1, Channel_2, Channel_4){
+void set_speed(int motor, float spd, float norm) {
+  if (spd > 0){
+    spd = map(spd, 0, 30, 0, 255);
+    switch (motor) {
+      case 0:
+        LeftFrontWheel.speed(spd);
+        LeftFrontWheel.run(FORWARD);
+        break;
+      case 1:
+        RightFrontWheel.speed(spd);
+        RightFrontWheel.run(FORWARD);
+        break;
+      case 2:
+        RightBackWheel.speed(spd);
+        RightBackWheel.run(FORWARD);
+        break;
+      case 3:
+        LeftBackWheel.speed(spd);
+        LeftBackWheel.run(FORWARD);
+        break;
+     }
+  }
 
+  if (spd < 0){
+  spd = map(abs(spd / norm) * 100, 0.0, 100.0, 0, 255);
+    switch (motor) {
+      case 0:
+        LeftFrontWheel.speed(spd);
+        LeftFrontWheel.run(BACKWARD);
+        break;
+      case 1:
+        RightFrontWheel.speed(spd);
+        RightFrontWheel.run(BACKWARD);
+        break;
+      case 2:
+        RightBackWheel.speed(spd);
+        RightBackWheel.run(BACKWARD);
+        break;
+      case 3:
+        LeftBackWheel.speed(spd);
+        LeftBackWheel.run(BACKWARD);
+        break;
 
+    }
+  }
+}
 
+void vector_movement(float X, float Y, float W) {
+  speed_0 = ((Y)+(arms_size*W));
+  speed_1 = ((-X)+(arms_size*W));
+  speed_2 = ((-Y)+(arms_size*W));
+  speed_3 = ((X)+(arms_size*W)
 
-
-
-
+  set_speed(0, speed_0, norm);
+  set_speed(1, speed_1, norm);
+  set_speed(2, speed_2, norm);
+  set_speed(3, speed_2, norm);
 }
 /*
   void moveForward() {
