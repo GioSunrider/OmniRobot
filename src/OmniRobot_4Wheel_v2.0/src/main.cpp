@@ -19,7 +19,7 @@
 // Declaracion de Variable Auxiliares
 // ------------------------------------------------------------------------------------------
 
-const float arms_size = 70; //mm
+const float arms_size = 65; //mm
 
 float speed_1 = 0;
 float speed_2 = 0;
@@ -54,6 +54,10 @@ void setup(){
 
   IBus.begin(Serial3);
 
+  LeftFrontWheel.run(RELEASE);
+  RightFrontWheel.run(RELEASE);
+  RightBackWheel.run(RELEASE);
+  LeftBackWheel.run(RELEASE)
 
   Serial.begin(9600);
 }
