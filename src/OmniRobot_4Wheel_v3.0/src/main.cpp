@@ -132,16 +132,16 @@ void set_speed(int motor, float spd) {
     spd = map(spd, 0, 30, 0, 255);
     switch (motor) {
       case 0:
-        analogWrite(PWMA, spd);
+        analogWrite(PWM_A, spd);
         break;
       case 1:
-        analogWrite(PWMB, spd);
+        analogWrite(PWM_B, spd);
         break;
       case 2:
-        analogWrite(PWMC, spd);
+        analogWrite(PWM_C, spd);
         break;
       case 3:
-        analogWrite(PWMD, spd);
+        analogWrite(PWM_D, spd);
         break;
      }
   }
@@ -162,16 +162,16 @@ void set_speed(int motor, float spd) {
   spd = map(spd, 0, 30, 0, 255);
     switch (motor) {
       case 0:
-        analogWrite(PWMA, spd);
+        analogWrite(PWM_A, spd);
         break;
       case 1:
-        analogWrite(PWMB, spd);
+        analogWrite(PWM_B, spd);
         break;
       case 2:
-        analogWrite(PWMC, spd);
+        analogWrite(PWM_C, spd);
         break;
       case 3:
-        analogWrite(PWMD, spd);
+        analogWrite(PWM_D, spd);
         break;
     }
   }
@@ -180,7 +180,7 @@ void set_speed(int motor, float spd) {
 void vector_movement(float X, float Y, float W)
 {
 
-  speed_A = ((Y)+(arms_size*W));                       
+  speed_A = ((Y)+(arms_size*W));
   speed_B = ((-X)+(arms_size*W));
   speed_C = ((-Y)+(arms_size*W));
   speed_D = ((X)+(arms_size*W));
