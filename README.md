@@ -17,7 +17,7 @@ Diseño e implementación de un robot omnidireccional para fines de entretenimie
 
 ### Four Wheel Robot
 
-* [100:1 Metal Gearmotor 37Dx57L mm](https://www.pololu.com/product/1106/specs)
+* [30:1 Metal Gearmotor 37Dx57L mm](https://www.pololu.com/product/4742)
 * [Pololu Dual MC33926 Motor Driver Carrier](https://www.pololu.com/product/1213)
 * [Pro Micro - 5V/16MHz](https://www.sparkfun.com/products/12640)
 * Partes Impresas en **PETG** de [Fiberlogy](https://fiberlogy.com/en/fiberlogy-filaments/filament-pet-g/)
