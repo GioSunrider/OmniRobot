@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name promicro_5v)(type Legacy)(uri ${KIPRJMOD}/promicro_5v.lib)(options "")(descr ""))
+)

@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP BPW34
+D Photodiode, filled shape
+K photodiode diode opto
+F ~
+$ENDCMP
+#
+#End Doc Library
