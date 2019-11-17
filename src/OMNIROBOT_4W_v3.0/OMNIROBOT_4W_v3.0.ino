@@ -20,6 +20,7 @@
 // ------------------------------------------------------------------------------------------
 
 #include <FlySkyIBus.h>
+#include <Servo.h>
 
 // ------------------------------------------------------------------------------------------
 // DEFINICION PINES Pololu Dual MC33926 Motor Driver Shield
@@ -50,9 +51,8 @@
 // ------------------------------------------------------------------------------------------
 
 #define analogInPin A3        // Pin analogico 1 para la lectura del Fototransistor
-#define OutPin      20  //A2  // Pin para el led indicador
-#define SalidaLaser 1         // Pin salida laser
-
+#define Servo_Laser 20        //A2  // Pin para el servo laser
+Servo ServoLaser;
 
 // ------------------------------------------------------------------------------------------
 // DEFINICION PINES Entrada iBus
@@ -114,11 +114,8 @@ void setup(){
   pinMode(MotorD1,OUTPUT);
   pinMode(MotorD2,OUTPUT);
   
-  pinMode(OutPin, OUTPUT);
-  pinMode(SalidaLaser, OUTPUT);
+  ServoLaser.attach(Servo_Laser);
   pinMode(analogInPin, INPUT);
-
-  Serial.begin(9600);
 }
 
 // ------------------------------------------------------------------------------------------
@@ -187,15 +184,6 @@ void vector_movement(float X, float Y, float W)
   speed_C = ((-Y)+(arms_size*W));
   speed_D = ((X)+(arms_size*W));
 
-  Serial.print("speed_A: ");
-  Serial.print(speed_A);
-  Serial.print(" speed_B: ");
-  Serial.print(speed_B);
-  Serial.print(" speed_C: ");
-  Serial.print(speed_C);
-  Serial.print(" speed_D: ");
-  Serial.println(speed_D);
-
   set_speed(0, speed_A);
   set_speed(1, speed_B);
   set_speed(2, speed_C);
@@ -221,7 +209,7 @@ Channel_1 = IBus.readChannel(0) - 1000; //Valores entre 0 y 1000 //Y
 Channel_2 = IBus.readChannel(1) - 1000; //Valores entre 0 y 1000 //X
 Channel_3 = IBus.readChannel(2) - 1000; //Valores entre 0 y 1000 //Laser
 Channel_4 = IBus.readChannel(3) - 1000; //Valores entre 0 y 1000 //W
-Channel_5 = IBus.readChannel(4) - 1000; //Valores entre 0 y 1000
+Channel_5 = IBus.readChannel(4) - 1000; //Valores entre 0 y 1000 //ENABLE
 
 // leemos el pin para y asignamos el valor a la variable.
 sensorValue = analogRead(analogInPin);
@@ -229,24 +217,11 @@ sensorValue = analogRead(analogInPin);
 // Si el valor obtenido es mayor a 900 se activa el LED
 if(sensorValue > thresholdMIN && sensorValue < thresholdMAX )
   {
-    digitalWrite(OutPin, HIGH);
-    Serial.print("LED = ON || " );
     lives = lives - 1;
     delay (500);
-  } else
-    {
-      digitalWrite(OutPin, LOW);
-      Serial.print("LED = OFF || " );
-    }
-
-// Imprimimos el valor en el monitor.
-Serial.print("Sensor = " );
-Serial.println(sensorValue);
+  }
 
 if (lives>0){
-
-Serial.print("Channel_5: ");
-Serial.println(Channel_5);
 
     if (Channel_5 > 500) //"ARMADO" de los motores
     {
@@ -286,23 +261,17 @@ Serial.println(Channel_5);
 
       }
 
-      Serial.print("Channel_1: ");
-      Serial.print(Channel_1);
-      Serial.print(" Channel_2: ");
-      Serial.print(Channel_2);
-      Serial.print(" Channel_4: ");
-      Serial.println(Channel_4);
-
     //Escritura
     vector_movement(Channel_2, Channel_1, Channel_4);
+    Channel_3 = map(Channel_3, 0, 1000, 0, 255);
+    ServoLaser.write(Channel_3);
   
     } else {
       digitalWrite (ENABLE, LOW);
     }
   } else{
     do{
-      Serial.print("SIN VIDAS");
-      Serial.println(Channel_4);
-    }while (lives=0);
+    digitalWrite (ENABLE, LOW);
+    }while (lives==0);
    }
 }
