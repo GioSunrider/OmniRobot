@@ -1,6 +1,6 @@
 /*
  * Designed by @GioSunrider
- * TFG OmniRobot V0.1
+ * TFG OmniRobot V0.3
  * CC-BY-SA
  *
  */
@@ -44,9 +44,10 @@
 // DEFINICION PINES Emision y Recepcion Laser
 // ------------------------------------------------------------------------------------------
 
-#define analogInPin A3        // Pin analogico 1 para la lectura del Fototransistor
-#define OutPin      20  //A2  // Pin para el led indicador
-#define SalidaLaser 1         // Pin salida laser
+#define analogInPin A3       // Pin analogico 1 para la lectura del Fototransistor
+#define Servo_Laser 3        // Pin para el servo laser
+#define LED_Golpe A2         //Led que ilumina cuando ha recibido un golpe
+#define Laser 1              // Control del Laser
 
 // ------------------------------------------------------------------------------------------
 // DEFINICION PINES Entrada iBus
@@ -59,6 +60,7 @@ float Channel_2;  //Left and Right pin
 float Channel_3;  //Shooter Up-Down
 float Channel_4;  //Rotation pin
 float Channel_5;  //ENABLE
+float Channel_6;  //Laser
 
 // ------------------------------------------------------------------------------------------
 // Distancia entre es extremo de los ejes y el centro
@@ -69,9 +71,9 @@ const float sqrt3o2 = sqrt(3)/2;
 const float arms_size = 110; //mm
 const float wheel_radius = 41/2; //mm
 
-float speed_0 = 0;
-float speed_1 = 0;
-float speed_2 = 0;
+float speed_A = 0;
+float speed_B = 0;
+float speed_C = 0;
 
 const int thresholdMIN = 90;  //Valor Umbral Minimo de Recepcion del fotodiodo
 const int thresholdMAX = 120; //Valor Umbral Maximo de Recepcion del fotodiodo
@@ -103,9 +105,9 @@ void setup(){
   pinMode(MotorC1,OUTPUT);
   pinMode(MotorC2,OUTPUT);
 
-  pinMode(OutPin, OUTPUT);
-  pinMode(SalidaLaser, OUTPUT);
   pinMode(analogInPin, INPUT);
+  pinMode(LED_Golpe,OUTPUT);
+  pinMode(Laser,OUTPUT);
 
   Serial.begin(9600);
 }
@@ -116,7 +118,7 @@ void setup(){
 
 void set_speed(int motor, float spd) {
   if (spd > 0){
-    spd = map(spd, 0, 5, 0, 255);
+    spd = map(spd, 0, 200, 0, 100);
     switch (motor) {
       case 0:
         digitalWrite(MotorA1, HIGH);
@@ -137,7 +139,7 @@ void set_speed(int motor, float spd) {
   }
 
   if (spd < 0){
-  spd = map(spd, 0, -5, 0, 255);
+  spd = map(spd, 0, -200, 0, 100);
     switch (motor) {
       case 0:
         digitalWrite(MotorA1, LOW);
@@ -161,22 +163,24 @@ void set_speed(int motor, float spd) {
 void vector_movement(float X, float Y, float W)
 {
 
-  speed_0 = ((-Y) + (arms_size * W)) / wheel_radius;                         //Frontal
-  speed_1 = ((sqrt3o2 * X) + (0.5 * Y) + (arms_size * W)) / wheel_radius;    //Izquierda
-  speed_2 = ((-sqrt3o2 * X) + (0.5 * Y) + (arms_size * W)) / wheel_radius;  //Derecha
+  speed_A = ((-Y) + (arms_size * W)) / wheel_radius;                         //Frontal
+  speed_B = ((sqrt3o2 * X) + (0.5 * Y) + (arms_size * W)) / wheel_radius;    //Izquierda
+  speed_C = ((-sqrt3o2 * X) + (0.5 * Y) + (arms_size * W)) / wheel_radius;  //Derecha
 
-  Serial.print("speed_0: ");
-  Serial.print(speed_0);
-  Serial.print(" speed_1: ");
-  Serial.print(speed_0);
-  Serial.print(" speed_2: ");
-  Serial.println(speed_0);
-
-  set_speed(0, speed_0);
-  set_speed(1, speed_1);
-  set_speed(2, speed_2);
+  set_speed(0, speed_A);
+  set_speed(1, speed_B);
+  set_speed(2, speed_C);
 }
 
+void moverServo (int angulo)
+{
+   float pausa;
+   pausa = angulo*2000.0/180.0 + 250;
+   digitalWrite(Servo_Laser, HIGH);
+   delayMicroseconds(pausa);
+   digitalWrite(Servo_Laser, LOW);
+   delayMicroseconds(2500-pausa);
+}
 
 // ------------------------------------------------------------------------------------------
 // Comienzo de los ciclos del programa
@@ -194,9 +198,17 @@ IBus.loop();
 
 Channel_1 = IBus.readChannel(0) - 1000; //Valores entre 0 y 1000 //Y
 Channel_2 = IBus.readChannel(1) - 1000; //Valores entre 0 y 1000 //X
-Channel_3 = IBus.readChannel(2) - 1000; //Valores entre 0 y 1000 //Laser
+Channel_3 = IBus.readChannel(2) - 1000; //Valores entre 0 y 1000 //Servo
 Channel_4 = IBus.readChannel(3) - 1000; //Valores entre 0 y 1000 //W
-Channel_5 = IBus.readChannel(4) - 1000; //Valores entre 0 y 1000
+Channel_5 = IBus.readChannel(4) - 1000; //Valores entre 0 y 1000 //ENABLE
+Channel_6 = IBus.readChannel(5) - 1000; //Valores entre 0 y 1000 //Laser
+
+//Encemos y apagamos laser
+if (Channel_6 > 500){
+  digitalWrite(Laser, HIGH);
+} else {
+  digitalWrite(Laser, LOW);
+}
 
 // leemos el pin para y asignamos el valor a la variable.
 sensorValue = analogRead(analogInPin);
@@ -204,80 +216,63 @@ sensorValue = analogRead(analogInPin);
 // Si el valor obtenido es mayor a 900 se activa el LED
 if(sensorValue > thresholdMIN && sensorValue < thresholdMAX )
   {
-    digitalWrite(OutPin, HIGH);
-    Serial.print("LED = ON || " );
     lives = lives - 1;
+    digitalWrite(LED_Golpe, HIGH);
     delay (500);
-  } else
-    {
-      digitalWrite(OutPin, LOW);
-      Serial.print("LED = OFF || " );
-    }
+    digitalWrite(LED_Golpe, LOW);
+  }
 
 if (lives>0){
 
-// Imprimimos el valor en el monitor.
-Serial.print("Sensor = " );
-Serial.println(sensorValue);
-Serial.print("Channel_5: ");
-Serial.println(Channel_5);
-
     if (Channel_5 > 500) //"ARMADO" de los motores
     {
-  
+
       digitalWrite (ENABLE, HIGH);
-  
+
       if(Channel_1>500){
-  
+
         Channel_1 = map(Channel_1, 500, 1000, 0, 100);
-  
+
       } else {
-  
+
         Channel_1 = map(Channel_1, 500, 0, 0, 100);
         Channel_1 = -Channel_1;
-  
+
       }
-  
+
       if(Channel_2>500){
-  
+
         Channel_2 = map(Channel_2, 500, 1000, 0, 100);
-  
+
       } else {
-  
+
         Channel_2 = map(Channel_2, 500, 0, 0, 100);
         Channel_2 = -Channel_2;
-  
+
       }
-  
+
       if(Channel_4>500){
-  
-        Channel_4 = map(Channel_4, 500, 1000, 0, 100);
-  
+
+        Channel_4 = map(Channel_4, 500, 1000, 0, 10);
+
       } else {
-  
-        Channel_4 = map(Channel_4, 500, 0, 0, 100);
+
+        Channel_4 = map(Channel_4, 500, 0, 0, 10);
         Channel_4 = -Channel_4;
-  
+
       }
-  
-      Serial.print("Channel_1: ");
-      Serial.print(Channel_1);
-      Serial.print(" Channel_2: ");
-      Serial.print(Channel_2);
-      Serial.print(" Channel_4: ");
-      Serial.println(Channel_4);
-  
+
     //Escritura
     vector_movement(Channel_2, Channel_1, Channel_4);
+    Channel_3 = map(Channel_3, 0, 1000, 0, 180);
+    moverServo(Channel_3);
   
-    }else {
+    } else {
       digitalWrite (ENABLE, LOW);
-    }  
-   } else{
+    }
+  } else{
     do{
-      Serial.print("SIN VIDAS");
-      Serial.println(Channel_4);
-    }while (lives=0);
+    digitalWrite (ENABLE, LOW);
+    }while (lives==0);
    }
-
 }
