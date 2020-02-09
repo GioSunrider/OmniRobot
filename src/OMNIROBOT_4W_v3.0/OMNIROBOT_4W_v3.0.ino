@@ -20,7 +20,6 @@
 // ------------------------------------------------------------------------------------------
 
 #include <FlySkyIBus.h>
-#include <Servo.h>
 
 // ------------------------------------------------------------------------------------------
 // DEFINICION PINES Pololu Dual MC33926 Motor Driver Shield
@@ -50,9 +49,10 @@
 // DEFINICION PINES Emision y Recepcion Laser
 // ------------------------------------------------------------------------------------------
 
-#define analogInPin A3        // Pin analogico 1 para la lectura del Fototransistor
-#define Servo_Laser 20        //A2  // Pin para el servo laser
-Servo ServoLaser;
+#define analogInPin A3       // Pin analogico 1 para la lectura del Fototransistor
+#define Servo_Laser 3        // Pin para el servo laser
+#define LED_Golpe A2         //Led que ilumina cuando ha recibido un golpe
+#define Laser 1              // Control del Laser
 
 // ------------------------------------------------------------------------------------------
 // DEFINICION PINES Entrada iBus
@@ -65,6 +65,7 @@ float Channel_2;  //Left and Right pin
 float Channel_3;  //Shooter Up-Down
 float Channel_4;  //Rotation pin
 float Channel_5;  //ENABLE
+float Channel_6;  //Laser
 
 // ------------------------------------------------------------------------------------------
 // Distancia entre es extremo de los ejes y el centro
@@ -72,8 +73,8 @@ float Channel_5;  //ENABLE
 // ------------------------------------------------------------------------------------------
 
 const float sqrt3o2 = sqrt(3)/2;
-const float arms_size = 110; //mm
-const float wheel_radius = 41/2; //mm
+const float arms_size = 120; //mm
+const float wheel_radius = 74/2; //mm
 
 float speed_A = 0;
 float speed_B = 0;
@@ -114,8 +115,9 @@ void setup(){
   pinMode(MotorD1,OUTPUT);
   pinMode(MotorD2,OUTPUT);
   
-  ServoLaser.attach(Servo_Laser);
   pinMode(analogInPin, INPUT);
+  pinMode(LED_Golpe,OUTPUT);
+  pinMode(Laser,OUTPUT);
 }
 
 // ------------------------------------------------------------------------------------------
@@ -190,6 +192,15 @@ void vector_movement(float X, float Y, float W)
   set_speed(3, speed_D);
 }
 
+void moverServo (int angulo)
+{
+   float pausa;
+   pausa = angulo*2000.0/180.0 + 250;
+   digitalWrite(Servo_Laser, HIGH);
+   delayMicroseconds(pausa);
+   digitalWrite(Servo_Laser, LOW);
+   delayMicroseconds(2500-pausa);
+}
 
 // ------------------------------------------------------------------------------------------
 // Comienzo de los ciclos del programa
@@ -207,9 +218,17 @@ IBus.loop();
 
 Channel_1 = IBus.readChannel(0) - 1000; //Valores entre 0 y 1000 //Y
 Channel_2 = IBus.readChannel(1) - 1000; //Valores entre 0 y 1000 //X
-Channel_3 = IBus.readChannel(2) - 1000; //Valores entre 0 y 1000 //Laser
+Channel_3 = IBus.readChannel(2) - 1000; //Valores entre 0 y 1000 //Servo
 Channel_4 = IBus.readChannel(3) - 1000; //Valores entre 0 y 1000 //W
 Channel_5 = IBus.readChannel(4) - 1000; //Valores entre 0 y 1000 //ENABLE
+Channel_6 = IBus.readChannel(5) - 1000; //Valores entre 0 y 1000 //Laser
+
+//Encemos y apagamos laser
+if (Channel_6 > 500){
+  digitalWrite(Laser, HIGH);
+} else {
+  digitalWrite(Laser, LOW);
+}
 
 // leemos el pin para y asignamos el valor a la variable.
 sensorValue = analogRead(analogInPin);
@@ -218,7 +237,9 @@ sensorValue = analogRead(analogInPin);
 if(sensorValue > thresholdMIN && sensorValue < thresholdMAX )
   {
     lives = lives - 1;
+    digitalWrite(LED_Golpe, HIGH);
     delay (500);
+    digitalWrite(LED_Golpe, LOW);
   }
 
 if (lives>0){
@@ -263,8 +284,8 @@ if (lives>0){
 
     //Escritura
     vector_movement(Channel_2, Channel_1, Channel_4);
-    Channel_3 = map(Channel_3, 0, 1000, 0, 255);
-    ServoLaser.write(Channel_3);
+    Channel_3 = map(Channel_3, 0, 1000, 0, 180);
+    moverServo(Channel_3);
   
     } else {
       digitalWrite (ENABLE, LOW);
